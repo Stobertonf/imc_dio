@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import 'package:imc_dio/ui/ios/pages/home_page.dart';
+import 'package:imc_dio/app/ui/ios/pages/home_page.dart';
 
 class MyCupertinoApp extends StatelessWidget {
   @override
