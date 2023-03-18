@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:imc_dio/blocs/imc.bloc.dart';
-import 'package:auto_size_text/auto_size_text.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -8,99 +6,143 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  var bloc = ImcBloc();
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  TextEditingController _weightController = TextEditingController();
+  TextEditingController _heightController = TextEditingController();
+  late String _result;
+
+  @override
+  void initState() {
+    super.initState();
+    resetFields();
+  }
+
+  void resetFields() {
+    _weightController.text = '';
+    _heightController.text = '';
+    setState(() {
+      _result = 'Informe seus dados';
+    });
+  }
+
+  void calculateImc() {
+    double weight = double.parse(_weightController.text);
+    double height = double.parse(_heightController.text) / 100.0;
+    double imc = weight / (height * height);
+
+    setState(() {
+      _result = "IMC = ${imc.toStringAsPrecision(2)}\n";
+      if (imc < 18.6)
+        _result += "Abaixo do peso";
+      else if (imc < 25.0)
+        _result += "Peso ideal";
+      else if (imc < 30.0)
+        _result += "Levemente acima do peso";
+      else if (imc < 35.0)
+        _result += "Obesidade Grau I";
+      else if (imc < 40.0)
+        _result += "Obesidade Grau II";
+      else
+        _result += "Obesidade Grau IIII";
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          "Cálculo de IMC",
-          textAlign: TextAlign.center,
-        ),
+      appBar: buildAppBar(),
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20.0),
+        child: buildForm(),
       ),
-      body: ListView(
+    );
+  }
+
+  AppBar buildAppBar() {
+    return AppBar(
+      title: const Text(
+        'Calculadora de IMC',
+      ),
+      backgroundColor: Colors.blue,
+      actions: <Widget>[
+        IconButton(
+          icon: const Icon(Icons.refresh),
+          onPressed: () {
+            resetFields();
+          },
+        )
+      ],
+    );
+  }
+
+  Form buildForm() {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: TextFormField(
-              controller: bloc.heightCtrl,
-              decoration: const InputDecoration(
-                labelText: "Altura (cm)",
-              ),
-              style: const TextStyle(
-                fontSize: 20,
-                color: Colors.black,
-                fontFamily: 'Poppins',
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: TextFormField(
-              controller: bloc.weigthCtrl,
-              decoration: const InputDecoration(
-                labelText: "Peso (KG)",
-              ),
-              style: const TextStyle(
-                fontSize: 20,
-                color: Colors.black,
-                fontFamily: 'Poppins',
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Text(
-              bloc.result,
-              textAlign: TextAlign.center,
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  bloc.calculate();
-                });
-              },
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(
-                    // vertical: 0,
-                    // horizontal: 15,
-                    ),
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(8.0),
-                  ),
-                  side: BorderSide(
-                    width: 1.5,
-                    color: Colors.white,
-                  ),
-                ),
-                backgroundColor: Colors.white,
-              ),
-              child: Container(
-                height: 48,
-                alignment: Alignment.center,
-                child: const AutoSizeText(
-                  'CALCULAR',
-                  presetFontSizes: [20, 16, 12],
-                  minFontSize: 12,
-                  maxFontSize: 20,
-                  maxLines: 1,
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontFamily: 'Poppins',
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ),
-          )
+          buildTextFormField(
+              label: "Peso (kg)",
+              error: "Insira seu peso!",
+              controller: _weightController),
+          buildTextFormField(
+              label: "Altura (cm)",
+              error: "Insira uma altura!",
+              controller: _heightController),
+          buildTextResult(),
+          buildCalculateButton(),
         ],
       ),
+    );
+  }
+
+  Padding buildCalculateButton() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        vertical: 36.0,
+      ),
+      child: ElevatedButton(
+        onPressed: () {
+          if (_formKey.currentState!.validate()) {
+            calculateImc();
+          }
+        },
+        child: const Text(
+          'CALCULAR',
+          style: TextStyle(
+            color: Colors.white,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Padding buildTextResult() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 36.0),
+      child: Text(
+        _result,
+        textAlign: TextAlign.center,
+      ),
+    );
+  }
+
+  TextFormField buildTextFormField({
+    required TextEditingController controller,
+    required String error,
+    required String label,
+  }) {
+    return TextFormField(
+      keyboardType: TextInputType.number,
+      decoration: InputDecoration(
+        labelText: label,
+      ),
+      controller: controller,
+      validator: (text) {
+        return text!.isEmpty ? error : null;
+      },
     );
   }
 }
