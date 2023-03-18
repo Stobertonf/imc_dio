@@ -10,7 +10,7 @@
 
 ## Escopo
 
-📚 Neste projeto, eu vou ter a oportunidade de fazer um app de IMC. O IMC nada mais classificação do índice de massa corporal (IMC), que vai ser possível ajudar a identificar obesidade ou desnutrição em crianças, adolescentes, adultos e idosos.
+📚 Neste projeto, eu vou ter a oportunidade de fazer um app de IMC. O IMC nada mais é a classificação do índice de massa corporal (IMC), que vai ser possível ajudar a identificar obesidade ou desnutrição em crianças, adolescentes, adultos e idosos.
 
 ## Foco
 
