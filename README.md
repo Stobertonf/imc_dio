@@ -18,7 +18,7 @@
 
 ## Prazo
 
-⚡ Este projeto foi finalizdo no dia 18/03/2023.
+⚡ Este projeto foi finalizado no dia 18/03/2023.
 
 ## Imagens
 
