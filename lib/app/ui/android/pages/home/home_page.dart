@@ -7,11 +7,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage>with  MessageSnackBar {
+  late String _result;
+  List<double> imcList = [];
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-
   TextEditingController _weightController = TextEditingController();
   TextEditingController _heightController = TextEditingController();
-  late String _result;
 
   @override
   void initState() {
@@ -25,6 +25,7 @@ class _HomePageState extends State<HomePage>with  MessageSnackBar {
     setState(() {
       _result = 'Informe seus dados';
     });
+    
   }
 
 
@@ -49,32 +50,65 @@ class _HomePageState extends State<HomePage>with  MessageSnackBar {
     return;
   }
   height /= 100.0;
+  
   double imc = weight / (height * height);
   setState(() {
     _result = "IMC = ${imc.toStringAsPrecision(2)}\n";
       if (imc < 18.6)
         _result += "Abaixo do peso";
-      else if (imc < 25.0)
+      else if (imc < 24.9)
         _result += "Peso ideal";
-      else if (imc < 30.0)
+      else if (imc < 29.9)
         _result += "Levemente acima do peso";
-      else if (imc < 35.0)
+      else if (imc < 34.9)
         _result += "Obesidade Grau I";
-      else if (imc < 40.0)
+      else if (imc < 39.9)
         _result += "Obesidade Grau II";
       else
-        _result += "Obesidade Grau IIII";
+        _result += "Obesidade Grau III";
+    imcList.add(imc);
   });
+}
+
+Widget buildIMCList() {
+  return SizedBox(
+    height: 200,
+    child: ListView.builder(
+      itemCount: imcList.length,
+      itemBuilder: (BuildContext context, int index) {
+        double imc = imcList[index];
+        String message = "IMC = ${imc.toStringAsPrecision(2)} ";
+        if (imc < 18.6)
+          _result += "Abaixo do peso";
+        else if (imc < 50.0)
+          _result += "Peso ideal";
+        else if (imc < 60.0)
+          _result += "Levemente acima do peso";
+        else if (imc < 75.0)
+          _result += "Obesidade Grau I";
+        else if (imc < 90.0)
+          _result += "Obesidade Grau II";
+        else
+          _result += "Obesidade Grau IIII";
+        return ListTile(
+          title: Text(message),
+        );
+      },
+    ),
+  );
 }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: buildAppBar(),
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20.0),
-        child: buildForm(),
+    return SizedBox(
+      height: 200,
+      child: Scaffold(
+        appBar: buildAppBar(),
+        backgroundColor: Colors.white,
+        body: SingleChildScrollView(
+          padding: const EdgeInsets.all(20.0),
+          child: buildForm(),
+        ),
       ),
     );
   }
@@ -113,6 +147,7 @@ class _HomePageState extends State<HomePage>with  MessageSnackBar {
               controller: _heightController),
           buildTextResult(),
           buildCalculateButton(),
+           buildIMCList(),
         ],
       ),
     );
