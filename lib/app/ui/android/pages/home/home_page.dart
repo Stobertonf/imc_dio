@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:imc_dio/app/shared/components/snackBar/message_snack_bar.dart';
 
 class HomePage extends StatefulWidget {
   @override
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage>with  MessageSnackBar {
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   TextEditingController _weightController = TextEditingController();
@@ -26,13 +27,31 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  void calculateImc() {
-    double weight = double.parse(_weightController.text);
-    double height = double.parse(_heightController.text) / 100.0;
-    double imc = weight / (height * height);
 
-    setState(() {
-      _result = "IMC = ${imc.toStringAsPrecision(2)}\n";
+  void showErrorMessageSnackBar(String message) {
+    final snackBar = SnackBar(
+      content: Text(message),
+      backgroundColor: Colors.red,
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+
+  void calculateImc() {
+  double weight = double.tryParse(_weightController.text) ?? 0.0;
+  double height = double.tryParse(_heightController.text) ?? 0.0;
+  if (weight == 0.0) {
+    showErrorMessageSnackBar("Insira um peso válido!");
+    return;
+  }
+  if (height == 0.0) {
+    showErrorMessageSnackBar("Insira uma altura válida!");
+    return;
+  }
+  height /= 100.0;
+  double imc = weight / (height * height);
+  setState(() {
+    _result = "IMC = ${imc.toStringAsPrecision(2)}\n";
       if (imc < 18.6)
         _result += "Abaixo do peso";
       else if (imc < 25.0)
@@ -45,8 +64,8 @@ class _HomePageState extends State<HomePage> {
         _result += "Obesidade Grau II";
       else
         _result += "Obesidade Grau IIII";
-    });
-  }
+  });
+}
 
   @override
   Widget build(BuildContext context) {
