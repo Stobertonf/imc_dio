@@ -23,9 +23,10 @@ class _HomePageState extends State<HomePage>with  MessageSnackBar {
     _weightController.text = '';
     _heightController.text = '';
     setState(() {
+      
       _result = 'Informe seus dados';
     });
-    
+      imcList.clear();
   }
 
 
