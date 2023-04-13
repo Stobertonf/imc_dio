@@ -23,8 +23,8 @@
 ## Imagens
 
 <p float="left" align="center">
-  <img src="https://i.ibb.co/8N6kdSZ/Imc-Dio.png" alt="Imc-Dio" border="0">
-  <img src="https://i.ibb.co/D9KJc3D/Imc-Dio-Message-Error.png" alt="Imc-Dio-Message-Error" border="0">
+  <img src="https://i.ibb.co/8N6kdSZ/Imc-Dio.png" alt="Imc-Dio" border="0" width="50%" />
+  <img src="https://i.ibb.co/D9KJc3D/Imc-Dio-Message-Error.png" alt="Imc-Dio-Message-Error" border="0" width="50%"/>
 </p> 
 
 
