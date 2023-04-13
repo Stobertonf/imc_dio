@@ -81,6 +81,7 @@ class _HomePageState extends State<HomePage>with  MessageSnackBar {
 
   AppBar buildAppBar() {
     return AppBar(
+      centerTitle: true,
       title: const Text(
         'Calculadora de IMC',
       ),
