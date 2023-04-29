@@ -1,6 +1,15 @@
 class ImcSQLiteModel {
-  String heigth = "";
-  String widget = "";
+  int? id;
+  String height;
+  String weight;
 
-  ImcSQLiteModel(this.heigth, this.widget);
+  ImcSQLiteModel({this.id, required this.height, required this.weight});
+
+  Map<String, dynamic> toMap() {
+    return {
+      'id': id,
+      'height': height,
+      'weight': weight,
+    };
+  }
 }
