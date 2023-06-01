@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:imc_dio/app/models/imc_model.dart';
+import 'package:imc_dio/app/repositorie/imc_repositorie.dart';
 import 'package:imc_dio/app/shared/components/snackBar/message_snack_bar.dart';
 
 class HomePage extends StatefulWidget {
@@ -8,7 +9,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with MessageSnackBar {
-  late String _result;
+  late String _result = 'Informe seus dados';
   List<double> imcList = [];
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   TextEditingController _weightController = TextEditingController();
@@ -37,7 +38,7 @@ class _HomePageState extends State<HomePage> with MessageSnackBar {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  void calculateImc() {
+  void calculateImc() async {
     double weight = double.tryParse(_weightController.text) ?? 0.0;
     double height = double.tryParse(_heightController.text) ?? 0.0;
     if (weight == 0.0) {
@@ -53,9 +54,9 @@ class _HomePageState extends State<HomePage> with MessageSnackBar {
     double imc = weight / (height * height);
     setState(() {
       _result = "IMC = ${imc.toStringAsPrecision(2)}\n";
-      if (imc < 18.6)
+      if (imc < 18.6) {
         _result += "Abaixo do peso";
-      else if (imc < 24.9)
+      } else if (imc < 24.9)
         _result += "Peso ideal";
       else if (imc < 29.9)
         _result += "Levemente acima do peso";
@@ -64,9 +65,14 @@ class _HomePageState extends State<HomePage> with MessageSnackBar {
       else if (imc < 39.9)
         _result += "Obesidade Grau II";
       else
-        _result += "Obesidade Grau III";
+        _result += "Obesidade Grausssss III";
       imcList.add(imc);
     });
+
+    // Save the new IMC result to the SQLite database
+    final repository = ImcRepository();
+    await repository.save(
+        ImcSQLiteModel(height: height.toString(), weight: weight.toString()));
   }
 
   Widget buildIMCList() {
@@ -77,18 +83,18 @@ class _HomePageState extends State<HomePage> with MessageSnackBar {
         itemBuilder: (BuildContext context, int index) {
           double imc = imcList[index];
           String message = "IMC = ${imc.toStringAsPrecision(2)} ";
-          if (imc < 18.6)
-            _result += "Abaixo do peso";
-          else if (imc < 50.0)
-            _result += "Peso ideal";
-          else if (imc < 60.0)
-            _result += "Levemente acima do peso";
-          else if (imc < 75.0)
-            _result += "Obesidade Grau I";
-          else if (imc < 90.0)
-            _result += "Obesidade Grau II";
+          if (imc < 18.6) {
+            message += "Abaixo do peso";
+          } else if (imc < 24.9)
+            message += "Peso ideal";
+          else if (imc < 29.9)
+            message += "Levemente acima do peso";
+          else if (imc < 34.9)
+            message += "Obesidade Grau I";
+          else if (imc < 39.9)
+            message += "Obesidade Grau II";
           else
-            _result += "Obesidade Grau IIII";
+            message += "Obesidade Graus III";
           return ListTile(
             title: Text(message),
           );
@@ -99,15 +105,12 @@ class _HomePageState extends State<HomePage> with MessageSnackBar {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 200,
-      child: Scaffold(
-        appBar: buildAppBar(),
-        backgroundColor: Colors.white,
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.all(20.0),
-          child: buildForm(),
-        ),
+    return Scaffold(
+      appBar: buildAppBar(),
+      backgroundColor: Colors.white,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(20.0),
+        child: buildForm(),
       ),
     );
   }
@@ -137,13 +140,15 @@ class _HomePageState extends State<HomePage> with MessageSnackBar {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: <Widget>[
           buildTextFormField(
-              label: "Peso (kg)",
-              error: "Insira seu peso!",
-              controller: _weightController),
+            label: "Peso (kg)",
+            error: "Insira seu peso!",
+            controller: _weightController,
+          ),
           buildTextFormField(
-              label: "Altura (cm)",
-              error: "Insira uma altura!",
-              controller: _heightController),
+            label: "Altura (cm)",
+            error: "Insira uma altura!",
+            controller: _heightController,
+          ),
           buildTextResult(),
           buildCalculateButton(),
           buildIMCList(),
