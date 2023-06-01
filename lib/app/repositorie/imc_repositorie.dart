@@ -1,12 +1,32 @@
+import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:imc_dio/app/models/imc_model.dart';
-import 'package:imc_dio/app/database/sqlitedatabase.dart';
 
-class ImcSQLiteRepository {
-  final SQLiteDataBase _database = SQLiteDataBase();
+class ImcRepository {
+  Future<Database> _getDatabase() async {
+    final String path = join(await getDatabasesPath(), 'imc_database.db');
+    return openDatabase(
+      path,
+      onCreate: (db, version) {
+        return db.execute(
+          'CREATE TABLE imc(id INTEGER PRIMARY KEY, height TEXT, weight TEXT)',
+        );
+      },
+      version: 1,
+    );
+  }
+
+  Future<void> save(ImcSQLiteModel imcModel) async {
+    final Database db = await _getDatabase();
+    await db.insert(
+      'imc',
+      imcModel.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
 
   Future<List<ImcSQLiteModel>> getAll() async {
-    final Database db = await _database.getDataBase();
+    final Database db = await _getDatabase();
     final List<Map<String, dynamic>> maps = await db.query('imc');
     return List.generate(maps.length, (i) {
       return ImcSQLiteModel(
@@ -15,23 +35,5 @@ class ImcSQLiteRepository {
         weight: maps[i]['weight'],
       );
     });
-  }
-
-  Future<void> save(ImcSQLiteModel imc) async {
-    final Database db = await _database.getDataBase();
-    await db.insert(
-      'imc',
-      imc.toMap(),
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-  }
-
-  Future<void> delete(int id) async {
-    final Database db = await _database.getDataBase();
-    await db.delete(
-      'imc',
-      where: 'id = ?',
-      whereArgs: [id],
-    );
   }
 }
